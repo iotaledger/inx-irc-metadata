@@ -76,7 +76,7 @@ func provide(c *dig.Container) error {
 				return *nftID, nil
 			},
 			func(ctx context.Context, key iotago.NFTID) ([]byte, error) {
-				_, output, err := indexer.NFT(ctx, key)
+				_, output, _, err := indexer.NFT(ctx, key)
 				if err != nil {
 					if errors.Is(err, nodeclient.ErrIndexerNotFound) {
 						return nil, echo.ErrNotFound
@@ -109,7 +109,7 @@ func provide(c *dig.Container) error {
 				return *foundryID, nil
 			},
 			func(ctx context.Context, key iotago.FoundryID) ([]byte, error) {
-				_, output, err := indexer.Foundry(ctx, key)
+				_, output, _, err := indexer.Foundry(ctx, key)
 				if err != nil {
 					if errors.Is(err, nodeclient.ErrHTTPNotFound) {
 						return nil, ErrLoadMetadataNotFound
