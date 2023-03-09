@@ -32,7 +32,7 @@ func setupRoutes(e *echo.Echo) {
 		return httpserver.JSONResponse(c, http.StatusOK, resp)
 	})
 
-	e.POST(RouteIRC30, func(c echo.Context) error {
+	e.GET(RouteIRC30, func(c echo.Context) error {
 		resp, err := loadIRC30(c)
 		if err != nil {
 			return err

@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/santhosh-tekuri/jsonschema/v5"
+	_ "github.com/santhosh-tekuri/jsonschema/v5/httploader"
 	"go.uber.org/dig"
 
 	"github.com/iotaledger/hive.go/core/app"
@@ -14,12 +16,18 @@ import (
 	"github.com/iotaledger/inx-irc-metadata/pkg/daemon"
 )
 
+const (
+	IRC27SchemaURL = "https://raw.githubusercontent.com/iotaledger/tips/main/tips/TIP-0027/irc27.schema.json"
+	IRC30SchemaURL = "https://raw.githubusercontent.com/iotaledger/tips/main/tips/TIP-0030/irc30.schema.json"
+)
+
 func init() {
 	CoreComponent = &app.CoreComponent{
 		Component: &app.Component{
 			Name:     "IRC",
 			Params:   params,
 			DepsFunc: func(cDeps dependencies) { deps = cDeps },
+			Provide:  provide,
 			Run:      run,
 		},
 	}
@@ -32,7 +40,35 @@ var (
 
 type dependencies struct {
 	dig.In
-	NodeBridge *nodebridge.NodeBridge
+	NodeBridge  *nodebridge.NodeBridge
+	IRC27Schema *jsonschema.Schema `name:"irc27Schema"`
+	IRC30Schema *jsonschema.Schema `name:"irc30Schema"`
+}
+
+func provide(c *dig.Container) error {
+	type outDeps struct {
+		dig.Out
+		IRC27Schema *jsonschema.Schema `name:"irc27Schema"`
+		IRC30Schema *jsonschema.Schema `name:"irc30Schema"`
+	}
+
+	return c.Provide(func() outDeps {
+		irc27, err := jsonschema.Compile(IRC27SchemaURL)
+		if err != nil {
+			panic(err)
+		}
+
+		irc30, err := jsonschema.Compile(IRC30SchemaURL)
+		if err != nil {
+			panic(err)
+		}
+
+		return outDeps{
+			IRC27Schema: irc27,
+			IRC30Schema: irc30,
+		}
+	})
+
 }
 
 func run() error {
