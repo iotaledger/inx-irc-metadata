@@ -5,15 +5,16 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
-	"github.com/santhosh-tekuri/jsonschema/v5"
-	_ "github.com/santhosh-tekuri/jsonschema/v5/httploader"
 	"go.uber.org/dig"
 
 	"github.com/iotaledger/hive.go/core/app"
 	"github.com/iotaledger/inx-app/pkg/httpserver"
 	"github.com/iotaledger/inx-app/pkg/nodebridge"
 	"github.com/iotaledger/inx-irc-metadata/pkg/daemon"
+	iotago "github.com/iotaledger/iota.go/v3"
+	"github.com/iotaledger/iota.go/v3/nodeclient"
 )
 
 const (
@@ -40,32 +41,101 @@ var (
 
 type dependencies struct {
 	dig.In
-	NodeBridge  *nodebridge.NodeBridge
-	IRC27Schema *jsonschema.Schema `name:"irc27Schema"`
-	IRC30Schema *jsonschema.Schema `name:"irc30Schema"`
+	NodeBridge *nodebridge.NodeBridge
+
+	IRC27Validator *MetadataValidator[iotago.NFTID]
+	IRC30Validator *MetadataValidator[iotago.FoundryID]
 }
 
 func provide(c *dig.Container) error {
-	type outDeps struct {
-		dig.Out
-		IRC27Schema *jsonschema.Schema `name:"irc27Schema"`
-		IRC30Schema *jsonschema.Schema `name:"irc30Schema"`
+	type inDeps struct {
+		dig.In
+		NodeBridge *nodebridge.NodeBridge
 	}
 
-	return c.Provide(func() outDeps {
-		irc27, err := jsonschema.Compile(IRC27SchemaURL)
+	type outDeps struct {
+		dig.Out
+		IRC27Validator *MetadataValidator[iotago.NFTID]
+		IRC30Validator *MetadataValidator[iotago.FoundryID]
+	}
+
+	return c.Provide(func(deps inDeps) outDeps {
+		client := deps.NodeBridge.INXNodeClient()
+
+		indexer, err := client.Indexer(context.Background())
 		if err != nil {
 			panic(err)
 		}
 
-		irc30, err := jsonschema.Compile(IRC30SchemaURL)
+		irc27, err := NewMetadataValidator[iotago.NFTID](IRC27SchemaURL, ParamsRestAPI.MetadataCacheSize,
+			func(c echo.Context) (iotago.NFTID, error) {
+				nftID, err := httpserver.ParseNFTIDParam(c, ParameterNFTID)
+				if err != nil {
+					return iotago.NFTID{}, err
+				}
+				return *nftID, nil
+			},
+			func(ctx context.Context, key iotago.NFTID) ([]byte, error) {
+				_, output, err := indexer.NFT(ctx, key)
+				if err != nil {
+					if errors.Is(err, nodeclient.ErrIndexerNotFound) {
+						return nil, echo.ErrNotFound
+					}
+					return nil, err
+				}
+
+				features, err := output.ImmutableFeatures.Set()
+				if err != nil {
+					return nil, httpserver.ErrNotAcceptable
+				}
+
+				metadata := features.MetadataFeature()
+				if metadata == nil {
+					return nil, httpserver.ErrNotAcceptable
+				}
+
+				return metadata.Data, nil
+			})
+		if err != nil {
+			panic(err)
+		}
+
+		irc30, err := NewMetadataValidator[iotago.FoundryID](IRC30SchemaURL, ParamsRestAPI.MetadataCacheSize,
+			func(c echo.Context) (iotago.FoundryID, error) {
+				foundryID, err := httpserver.ParseFoundryIDParam(c, ParameterNativeTokenID)
+				if err != nil {
+					return iotago.FoundryID{}, err
+				}
+				return *foundryID, nil
+			},
+			func(ctx context.Context, key iotago.FoundryID) ([]byte, error) {
+				_, output, err := indexer.Foundry(ctx, key)
+				if err != nil {
+					if errors.Is(err, nodeclient.ErrHTTPNotFound) {
+						return nil, ErrLoadMetadataNotFound
+					}
+					return nil, err
+				}
+
+				features, err := output.ImmutableFeatures.Set()
+				if err != nil {
+					return nil, ErrLoadMetadataInvalid
+				}
+
+				metadata := features.MetadataFeature()
+				if metadata == nil {
+					return nil, ErrLoadMetadataInvalid
+				}
+
+				return metadata.Data, nil
+			})
 		if err != nil {
 			panic(err)
 		}
 
 		return outDeps{
-			IRC27Schema: irc27,
-			IRC30Schema: irc30,
+			IRC27Validator: irc27,
+			IRC30Validator: irc30,
 		}
 	})
 

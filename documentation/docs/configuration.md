@@ -131,6 +131,7 @@ Example:
 | bindAddress               | The bind address on which the IRC-Metadata HTTP server listens                               | string  | "localhost:9687" |
 | advertiseAddress          | The address of the IRC-Metadata HTTP server which is advertised to the INX Server (optional) | string  | ""               |
 | debugRequestLoggerEnabled | Whether the debug logging for requests should be enabled                                     | boolean | false            |
+| metadataCacheSize         | Defines the size of the cache for each IRC standard                                          | int     | 1000             |
 
 Example:
 
@@ -139,7 +140,8 @@ Example:
     "restAPI": {
       "bindAddress": "localhost:9687",
       "advertiseAddress": "",
-      "debugRequestLoggerEnabled": false
+      "debugRequestLoggerEnabled": false,
+      "metadataCacheSize": 1000
     }
   }
 ```

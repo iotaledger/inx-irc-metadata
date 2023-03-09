@@ -28,7 +28,8 @@
   "restAPI": {
     "bindAddress": "localhost:9687",
     "advertiseAddress": "",
-    "debugRequestLoggerEnabled": false
+    "debugRequestLoggerEnabled": false,
+    "metadataCacheSize": 1000
   },
   "profiling": {
     "enabled": false,

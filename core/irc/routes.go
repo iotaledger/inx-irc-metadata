@@ -1,11 +1,7 @@
 package irc
 
 import (
-	"net/http"
-
 	"github.com/labstack/echo/v4"
-
-	"github.com/iotaledger/inx-app/pkg/httpserver"
 )
 
 const (
@@ -22,22 +18,11 @@ const (
 )
 
 func setupRoutes(e *echo.Echo) {
-
 	e.GET(RouteIRC27, func(c echo.Context) error {
-		resp, err := loadIRC27(c)
-		if err != nil {
-			return err
-		}
-
-		return httpserver.JSONResponse(c, http.StatusOK, resp)
+		return deps.IRC27Validator.HandleRequest(c)
 	})
 
 	e.GET(RouteIRC30, func(c echo.Context) error {
-		resp, err := loadIRC30(c)
-		if err != nil {
-			return err
-		}
-
-		return httpserver.JSONResponse(c, http.StatusOK, resp)
+		return deps.IRC30Validator.HandleRequest(c)
 	})
 }

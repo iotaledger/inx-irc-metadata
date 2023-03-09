@@ -12,8 +12,11 @@ type ParametersRestAPI struct {
 	// AdvertiseAddress defines the address of the IRC-Metadata HTTP server which is advertised to the INX Server (optional).
 	AdvertiseAddress string `default:"" usage:"the address of the IRC-Metadata HTTP server which is advertised to the INX Server (optional)"`
 
-	// DebugRequestLoggerEnabled defines whether the debug logging for requests should be enabled
+	// DebugRequestLoggerEnabled defines whether the debug logging for requests should be enabled.
 	DebugRequestLoggerEnabled bool `default:"false" usage:"whether the debug logging for requests should be enabled"`
+
+	// MetadataCacheSize defines the size of the cache for each IRC standard.
+	MetadataCacheSize int `default:"1000" usage:"defines the size of the cache for each IRC standard"`
 }
 
 var ParamsRestAPI = &ParametersRestAPI{}

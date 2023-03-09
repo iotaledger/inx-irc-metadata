@@ -36,6 +36,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 // indirect
 	github.com/hashicorp/go-version v1.6.0 // indirect
+	github.com/hashicorp/golang-lru/v2 v2.0.1 // indirect
 	github.com/iancoleman/orderedmap v0.2.0 // indirect
 	github.com/iotaledger/hive.go/serializer/v2 v2.0.0-rc.1 // indirect
 	github.com/iotaledger/inx/go v1.0.0-rc.1 // indirect
