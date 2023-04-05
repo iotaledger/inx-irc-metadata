@@ -9,7 +9,7 @@ require (
 	github.com/iotaledger/iota.go/v3 v3.0.0-rc.2
 	github.com/labstack/echo/v4 v4.10.2
 	github.com/pkg/errors v0.9.1
-	github.com/santhosh-tekuri/jsonschema/v5 v5.2.0
+	github.com/santhosh-tekuri/jsonschema/v5 v5.3.0
 	go.uber.org/dig v1.16.1
 )
 
