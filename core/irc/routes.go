@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	APIRoute = "irc-metadata/v1"
+	APIRoute = "/api/irc-metadata/v1"
 
 	// ParameterNFTID is used to identify a NFT by its ID.
 	ParameterNFTID = "nftID"
@@ -17,12 +17,12 @@ const (
 	RouteIRC30 = "/tokens/:" + ParameterNativeTokenID
 )
 
-func setupRoutes(e *echo.Echo) {
-	e.GET(RouteIRC27, func(c echo.Context) error {
+func setupRoutes(group *echo.Group) {
+	group.GET(RouteIRC27, func(c echo.Context) error {
 		return deps.IRC27Validator.HandleRequest(c)
 	})
 
-	e.GET(RouteIRC30, func(c echo.Context) error {
+	group.GET(RouteIRC30, func(c echo.Context) error {
 		return deps.IRC30Validator.HandleRequest(c)
 	})
 }
