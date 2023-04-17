@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/hashicorp/golang-lru/v2 v2.0.2
 	github.com/iotaledger/hive.go/app v0.0.0-20230417125513-e2e89991217f
-	github.com/iotaledger/inx-app v1.0.0-rc.3.0.20230417131029-0bfe891d7c4a
+	github.com/iotaledger/inx-app v1.0.0-rc.3.0.20230417173151-cde47df5fe79
 	github.com/iotaledger/iota.go/v3 v3.0.0-rc.2
 	github.com/labstack/echo/v4 v4.10.2
 	github.com/pkg/errors v0.9.1
