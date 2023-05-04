@@ -10,7 +10,7 @@ require (
 	github.com/labstack/echo/v4 v4.10.2
 	github.com/pkg/errors v0.9.1
 	github.com/santhosh-tekuri/jsonschema/v5 v5.2.0
-	go.uber.org/dig v1.16.1
+	go.uber.org/dig v1.17.0
 )
 
 require (
