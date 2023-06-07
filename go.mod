@@ -3,7 +3,7 @@ module github.com/iotaledger/inx-irc-metadata
 go 1.19
 
 require (
-	github.com/hashicorp/golang-lru/v2 v2.0.2
+	github.com/hashicorp/golang-lru/v2 v2.0.3
 	github.com/iotaledger/hive.go/core v1.0.0-rc.3
 	github.com/iotaledger/inx-app v1.0.0-rc.3
 	github.com/iotaledger/iota.go/v3 v3.0.0-rc.2
