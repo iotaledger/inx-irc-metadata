@@ -72,6 +72,7 @@ func provide(c *dig.Container) error {
 				if err != nil {
 					return iotago.NFTID{}, err
 				}
+
 				return *nftID, nil
 			},
 			func(ctx context.Context, key iotago.NFTID) ([]byte, error) {
@@ -80,6 +81,7 @@ func provide(c *dig.Container) error {
 					if errors.Is(err, nodeclient.ErrIndexerNotFound) {
 						return nil, echo.ErrNotFound
 					}
+
 					return nil, err
 				}
 
@@ -105,6 +107,7 @@ func provide(c *dig.Container) error {
 				if err != nil {
 					return iotago.FoundryID{}, err
 				}
+
 				return *foundryID, nil
 			},
 			func(ctx context.Context, key iotago.FoundryID) ([]byte, error) {
@@ -113,6 +116,7 @@ func provide(c *dig.Container) error {
 					if errors.Is(err, nodeclient.ErrHTTPNotFound) {
 						return nil, ErrLoadMetadataNotFound
 					}
+
 					return nil, err
 				}
 
