@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/iotaledger/inx-irc-metadata/core/app"
+	"github.com/iotaledger/inx-irc-metadata/components/app"
 )
 
 func main() {

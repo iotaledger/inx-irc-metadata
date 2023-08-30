@@ -1,3 +1,4 @@
+//nolint:structcheck
 package irc
 
 import (
@@ -9,6 +10,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 	"github.com/santhosh-tekuri/jsonschema/v5"
+
+	//nolint:golint // this is on purpose
 	_ "github.com/santhosh-tekuri/jsonschema/v5/httploader"
 
 	"github.com/iotaledger/inx-app/pkg/httpserver"
@@ -86,12 +89,14 @@ func (v *MetadataValidator[K]) validate(key K, bytes []byte) *cachedMetadata {
 func (v *MetadataValidator[K]) storeNotFound(key K) *cachedMetadata {
 	cached := newCachedError(echo.ErrNotFound)
 	v.cache.Add(key, cached)
+
 	return cached
 }
 
 func (v *MetadataValidator[K]) storeInvalid(key K) *cachedMetadata {
 	cached := newCachedError(httpserver.ErrNotAcceptable)
 	v.cache.Add(key, cached)
+
 	return cached
 }
 
