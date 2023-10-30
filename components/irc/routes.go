@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	APIRoute = "/api/irc-metadata/v1"
+	APIRoute = "/api/irc-metadata/v2"
 
 	// ParameterNFTID is used to identify a NFT by its ID.
 	ParameterNFTID = "nftID"

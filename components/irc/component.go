@@ -7,15 +7,15 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"go.uber.org/dig"
 
 	"github.com/iotaledger/hive.go/app"
+	"github.com/iotaledger/hive.go/ierrors"
 	"github.com/iotaledger/inx-app/pkg/httpserver"
 	"github.com/iotaledger/inx-app/pkg/nodebridge"
 	"github.com/iotaledger/inx-irc-metadata/pkg/daemon"
-	iotago "github.com/iotaledger/iota.go/v3"
-	"github.com/iotaledger/iota.go/v3/nodeclient"
+	iotago "github.com/iotaledger/iota.go/v4"
+	"github.com/iotaledger/iota.go/v4/nodeclient"
 )
 
 const (
@@ -59,7 +59,10 @@ func provide(c *dig.Container) error {
 	}
 
 	return c.Provide(func(deps inDeps) outDeps {
-		client := deps.NodeBridge.INXNodeClient()
+		client, err := deps.NodeBridge.INXNodeClient()
+		if err != nil {
+			panic(err)
+		}
 
 		indexer, err := client.Indexer(context.Background())
 		if err != nil {
@@ -73,12 +76,12 @@ func provide(c *dig.Container) error {
 					return iotago.NFTID{}, err
 				}
 
-				return *nftID, nil
+				return nftID, nil
 			},
 			func(ctx context.Context, key iotago.NFTID) ([]byte, error) {
 				_, output, _, err := indexer.NFT(ctx, key)
 				if err != nil {
-					if errors.Is(err, nodeclient.ErrIndexerNotFound) {
+					if ierrors.Is(err, nodeclient.ErrIndexerNotFound) {
 						return nil, echo.ErrNotFound
 					}
 
@@ -90,7 +93,7 @@ func provide(c *dig.Container) error {
 					return nil, httpserver.ErrNotAcceptable
 				}
 
-				metadata := features.MetadataFeature()
+				metadata := features.Metadata()
 				if metadata == nil {
 					return nil, httpserver.ErrNotAcceptable
 				}
@@ -108,12 +111,12 @@ func provide(c *dig.Container) error {
 					return iotago.FoundryID{}, err
 				}
 
-				return *foundryID, nil
+				return foundryID, nil
 			},
 			func(ctx context.Context, key iotago.FoundryID) ([]byte, error) {
 				_, output, _, err := indexer.Foundry(ctx, key)
 				if err != nil {
-					if errors.Is(err, nodeclient.ErrHTTPNotFound) {
+					if ierrors.Is(err, nodeclient.ErrHTTPNotFound) {
 						return nil, ErrLoadMetadataNotFound
 					}
 
@@ -125,7 +128,7 @@ func provide(c *dig.Container) error {
 					return nil, ErrLoadMetadataInvalid
 				}
 
-				metadata := features.MetadataFeature()
+				metadata := features.Metadata()
 				if metadata == nil {
 					return nil, ErrLoadMetadataInvalid
 				}
@@ -157,7 +160,7 @@ func run() error {
 
 		go func() {
 			Component.LogInfof("You can now access the API using: http://%s", ParamsRestAPI.BindAddress)
-			if err := e.Start(ParamsRestAPI.BindAddress); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			if err := e.Start(ParamsRestAPI.BindAddress); err != nil && !ierrors.Is(err, http.ErrServerClosed) {
 				Component.LogErrorfAndExit("Stopped REST-API server due to an error (%s)", err)
 			}
 		}()
