@@ -8,18 +8,18 @@ import (
 
 	lru "github.com/hashicorp/golang-lru/v2"
 	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"github.com/santhosh-tekuri/jsonschema/v5"
 
 	//nolint:golint // this is on purpose
 	_ "github.com/santhosh-tekuri/jsonschema/v5/httploader"
 
+	"github.com/iotaledger/hive.go/ierrors"
 	"github.com/iotaledger/inx-app/pkg/httpserver"
 )
 
 var (
-	ErrLoadMetadataNotFound = errors.New("metadata not found")
-	ErrLoadMetadataInvalid  = errors.New("invalid metadata")
+	ErrLoadMetadataNotFound = ierrors.New("metadata not found")
+	ErrLoadMetadataInvalid  = ierrors.New("invalid metadata")
 )
 
 type MetadataValidator[K comparable] struct {
@@ -57,10 +57,10 @@ func (v *MetadataValidator[K]) get(ctx context.Context, key K) (*cachedMetadata,
 
 	bytes, err := v.loadValueFunc(ctx, key)
 	if err != nil {
-		if errors.Is(err, ErrLoadMetadataNotFound) {
+		if ierrors.Is(err, ErrLoadMetadataNotFound) {
 			return v.storeNotFound(key), nil
 		}
-		if errors.Is(err, ErrLoadMetadataInvalid) {
+		if ierrors.Is(err, ErrLoadMetadataInvalid) {
 			return v.storeInvalid(key), nil
 		}
 
